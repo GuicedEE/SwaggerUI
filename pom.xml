@@ -13,7 +13,7 @@
     <artifactId>guiced-swagger-ui</artifactId>
     <packaging>jar</packaging>
 
-    <name>Guiced Swagger</name>
+    <name>Guiced Swagger UI</name>
     <description>Places the Swagger UI at the /swagger-ui location
     </description>
     <url>https://github.com/GedMarc/GuicedSwagger</url>
