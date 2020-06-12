@@ -18,6 +18,11 @@
     </description>
     <url>https://github.com/GedMarc/GuicedSwagger</url>
 
+    <properties>
+        <skipTests>true</skipTests>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.guicedee</groupId>
