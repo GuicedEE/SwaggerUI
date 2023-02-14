@@ -32,6 +32,10 @@
             <artifactId>guiced-undertow</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.guicedee.servlets</groupId>
+            <artifactId>guiced-servlets</artifactId>
+        </dependency>
     </dependencies>
 
     <scm>
