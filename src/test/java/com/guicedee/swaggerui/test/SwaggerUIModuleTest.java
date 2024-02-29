@@ -1,6 +1,7 @@
 package com.guicedee.swaggerui.test;
 
-import com.guicedee.guicedinjection.GuiceContext;
+
+import com.guicedee.client.*;
 import com.guicedee.guicedservlets.undertow.GuicedUndertow;
 import io.undertow.Undertow;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,6 @@ public class SwaggerUIModuleTest
 		RESTContext.getProviders()
 		           .add(JacksonJsonProvider.class.getCanonicalName());
 		*/
-		
-		GuiceContext.instance()
-		            .loadIGuiceModules()
-		            .add(new RestTestBinding());
 
 		//LogFactory.configureConsoleColourOutput(Level.FINE);
 		Undertow undertow = GuicedUndertow.boot("0.0.0.0", 6004);

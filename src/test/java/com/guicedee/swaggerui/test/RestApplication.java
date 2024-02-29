@@ -1,6 +1,6 @@
 package com.guicedee.swaggerui.test;
 
-import com.guicedee.guicedinjection.GuiceContext;
+import com.guicedee.client.*;
 import jakarta.ws.rs.core.Application;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class RestApplication extends Application
 	@Override
 	public Set<Object> getSingletons()
 	{
-		singletons.add(GuiceContext.get(HelloResource.class));
+		singletons.add(IGuiceContext.get(HelloResource.class));
 		return singletons;
 	}
 }

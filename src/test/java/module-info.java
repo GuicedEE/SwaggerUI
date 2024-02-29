@@ -1,3 +1,6 @@
+import com.guicedee.guicedinjection.interfaces.*;
+import com.guicedee.swaggerui.test.*;
+
 module guiced.rest.swaggerui.test {
 	requires com.guicedee.guicedservlets.swaggerui;
 	
@@ -9,7 +12,9 @@ module guiced.rest.swaggerui.test {
 	
 	requires jakarta.ws.rs;
 	requires com.google.guice;
-	requires com.guicedee.guicedinjection;
+	requires com.guicedee.client;
 	requires com.guicedee.guicedservlets.undertow;
+	
+	provides IGuiceModule with RestTestBinding;
 	
 }

@@ -49,6 +49,11 @@
             <artifactId>guiced-openapi</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.guicedee</groupId>
+            <artifactId>guice-injection</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
