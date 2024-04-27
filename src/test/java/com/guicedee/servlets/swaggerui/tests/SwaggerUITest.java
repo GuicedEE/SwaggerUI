@@ -34,4 +34,10 @@ public class SwaggerUITest
                                             HttpResponse.BodyHandlers.discarding());
         assertEquals(200, response.statusCode());
     }
+
+    public static void main(String[] args)
+    {
+        IGuiceContext.instance()
+                     .inject();
+    }
 }
