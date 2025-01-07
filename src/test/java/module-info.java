@@ -1,5 +1,5 @@
 module guiced.swagger.ui.tests {
-    requires com.guicedee.guicedservlets.swaggerui;
+    requires com.guicedee.swaggerui;
     requires com.guicedee.client;
     requires com.guicedee.guicedinjection;
     requires org.junit.jupiter.api;
