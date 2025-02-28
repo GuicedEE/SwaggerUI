@@ -1,6 +1,6 @@
 package com.guicedee.servlets.swaggerui;
 
-import com.guicedee.vertx.spi.VertxRouterConfigurator;
+import com.guicedee.vertx.web.spi.VertxRouterConfigurator;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 

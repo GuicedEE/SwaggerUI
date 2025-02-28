@@ -1,9 +1,8 @@
 import com.guicedee.servlets.swaggerui.SwaggerUIRegistration;
 
 open module com.guicedee.swaggerui {
-    requires com.guicedee.vertx;
-    requires transitive io.vertx.core;
+    requires com.guicedee.vertx.web;
 
-    provides com.guicedee.vertx.spi.VertxRouterConfigurator with SwaggerUIRegistration;
+    provides com.guicedee.vertx.web.spi.VertxRouterConfigurator with SwaggerUIRegistration;
 
 }
