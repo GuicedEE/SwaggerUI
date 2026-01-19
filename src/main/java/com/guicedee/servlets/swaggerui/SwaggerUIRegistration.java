@@ -114,15 +114,6 @@ public class SwaggerUIRegistration implements VertxRouterConfigurator<SwaggerUIR
     }
 
     private static String getConfigValue(String key) {
-        String value = System.getProperty(key);
-        if (value != null) {
-            return value;
-        }
-        value = System.getenv(key);
-        if (value != null) {
-            return value;
-        }
-        String envKey = key.toUpperCase().replaceAll("[^A-Z0-9]", "_");
-        return System.getenv(envKey);
+        return com.guicedee.client.Environment.getSystemPropertyOrEnvironment(key, null);
     }
 }
