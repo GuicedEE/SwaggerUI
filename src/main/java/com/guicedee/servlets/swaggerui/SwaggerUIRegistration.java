@@ -1,8 +1,9 @@
 package com.guicedee.servlets.swaggerui;
 
+import com.google.common.base.Strings;
 import com.guicedee.vertx.web.spi.VertxRouterConfigurator;
+import io.vertx.core.http.MimeMapping;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.StaticHandler;
 
 /**
  * Registers the Swagger UI static content with a Vert.x {@link Router}.
@@ -53,25 +54,88 @@ public class SwaggerUIRegistration implements VertxRouterConfigurator<SwaggerUIR
 
     /**
      * Adds the Swagger UI static handler to the supplied router.
+     * <p>
+     * Uses direct classpath resource loading via the module's {@link ClassLoader}
+     * to serve files, which is compatible with JPMS where the Vert.x
+     * static handler file resolver cannot access module resources.
+     * </p>
      *
-     * @param builder the router to configure
+     * @param router the router to configure
      * @return the same router instance after registration
      */
     @Override
-    public Router builder(Router builder) {
+    public Router builder(Router router) {
         if (!readBoolean(PROPERTY_ENABLED, DEFAULT_ENABLED)) {
-            return builder;
+            return router;
         }
-        String route = normalizeRoute(readString(PROPERTY_ROUTE, DEFAULT_ROUTE));
+        String routePrefix = readString(PROPERTY_ROUTE, DEFAULT_ROUTE);
+        // Strip trailing /* for path prefix extraction
+        String pathPrefix = routePrefix.endsWith("/*")
+                ? routePrefix.substring(0, routePrefix.length() - 1)
+                : routePrefix.endsWith("*")
+                ? routePrefix.substring(0, routePrefix.length() - 1)
+                : routePrefix;
+        if (!pathPrefix.startsWith("/")) {
+            pathPrefix = "/" + pathPrefix;
+        }
+        String route = normalizeRoute(routePrefix);
         String resourceRoot = readString(PROPERTY_RESOURCE_ROOT, DEFAULT_RESOURCE_ROOT);
-        StaticHandler handler = StaticHandler.create(resourceRoot)
-                .setFilesReadOnly(readBoolean(PROPERTY_FILES_READ_ONLY, DEFAULT_FILES_READ_ONLY))
-                .setCachingEnabled(readBoolean(PROPERTY_CACHE_ENABLED, DEFAULT_CACHE_ENABLED))
-                .setMaxAgeSeconds(readLong(PROPERTY_CACHE_MAX_AGE_SECONDS, DEFAULT_CACHE_MAX_AGE_SECONDS))
-                .setDirectoryListing(readBoolean(PROPERTY_DIRECTORY_LISTING, DEFAULT_DIRECTORY_LISTING))
-                .setIndexPage(readString(PROPERTY_INDEX_PAGE, DEFAULT_INDEX_PAGE));
-        builder.route(route).handler(handler);
-        return builder;
+        String indexPage = readString(PROPERTY_INDEX_PAGE, DEFAULT_INDEX_PAGE);
+        long maxAge = readLong(PROPERTY_CACHE_MAX_AGE_SECONDS, DEFAULT_CACHE_MAX_AGE_SECONDS);
+        boolean cacheEnabled = readBoolean(PROPERTY_CACHE_ENABLED, DEFAULT_CACHE_ENABLED);
+
+        // Use Module.getResourceAsStream() — in JPMS, non-package resources
+        // (like swagger/) are encapsulated and not accessible via ClassLoader
+        // from other modules. Module.getResourceAsStream() works because it
+        // resolves resources within the module's own namespace.
+        Module swaggerModule = SwaggerUIRegistration.class.getModule();
+
+        System.out.println("[SwaggerUI] Registering route: " + route + " with prefix: " + pathPrefix + " resourceRoot: " + resourceRoot);
+        System.out.println("[SwaggerUI] Module: " + swaggerModule.getName() + ", isNamed: " + swaggerModule.isNamed());
+        // Quick probe of the resource
+        try {
+            var probe = swaggerModule.getResourceAsStream(resourceRoot + "/" + indexPage);
+            System.out.println("[SwaggerUI] Probe " + resourceRoot + "/" + indexPage + " => " + probe);
+            if (probe != null) probe.close();
+        } catch (Exception e) {
+            System.out.println("[SwaggerUI] Probe failed: " + e);
+        }
+
+        final String prefix = pathPrefix;
+        router.get(route).handler(ctx -> {
+            System.out.println("[SwaggerUI] Handler invoked for: " + ctx.normalizedPath());
+            String normalisedPath = ctx.normalizedPath();
+            String path = normalisedPath.length() > prefix.length()
+                    ? normalisedPath.substring(prefix.length())
+                    : "";
+            // Strip leading slash from path
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            if (path.isEmpty()) {
+                path = indexPage;
+            }
+
+            String resource = resourceRoot + "/" + path;
+
+            try (var in = swaggerModule.getResourceAsStream(resource)) {
+                if (in == null) {
+                    ctx.response().setStatusCode(404).end();
+                    return;
+                }
+                var response = ctx.response()
+                        .putHeader("content-type", MimeMapping.mimeTypeForFilename(path));
+                if (cacheEnabled) {
+                    response.putHeader("cache-control", "public, max-age=" + maxAge);
+                }
+                response.end(io.vertx.core.buffer.Buffer.buffer(in.readAllBytes()));
+            } catch (Exception e) {
+                ctx.fail(e);
+            }
+        });
+
+
+        return router;
     }
 
     private static String normalizeRoute(String route) {
@@ -93,17 +157,17 @@ public class SwaggerUIRegistration implements VertxRouterConfigurator<SwaggerUIR
 
     private static String readString(String key, String defaultValue) {
         String value = getConfigValue(key);
-        return value == null || value.isBlank() ? defaultValue : value.trim();
+        return Strings.isNullOrEmpty(value) ? defaultValue : value.trim();
     }
 
     private static boolean readBoolean(String key, boolean defaultValue) {
         String value = getConfigValue(key);
-        return value == null ? defaultValue : Boolean.parseBoolean(value.trim());
+        return Strings.isNullOrEmpty(value)? defaultValue : Boolean.parseBoolean(value.trim());
     }
 
     private static long readLong(String key, long defaultValue) {
         String value = getConfigValue(key);
-        if (value == null || value.isBlank()) {
+        if (Strings.isNullOrEmpty(value)) {
             return defaultValue;
         }
         try {
