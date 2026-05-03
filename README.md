@@ -27,7 +27,7 @@ Built on [Swagger UI](https://swagger.io/tools/swagger-ui/)   [Vert.x](https://
 <summary>Gradle (Kotlin DSL)</summary>
 
 ```kotlin
-implementation("com.guicedee:guiced-swagger-ui:2.0.1")
+implementation("com.guicedee:guiced-swagger-ui:2.0.2-SNAPSHOT")
 ```
 </details>
 
