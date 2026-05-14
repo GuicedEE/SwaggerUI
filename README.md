@@ -19,7 +19,7 @@ Built on [Swagger UI](https://swagger.io/tools/swagger-ui/)   [Vert.x](https://
 ```xml
 <dependency>
   <groupId>com.guicedee</groupId>
-  <artifactId>guiced-swagger-ui</artifactId>
+  <artifactId>swagger-ui</artifactId>
 </dependency>
 ```
 

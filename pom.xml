@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.guicedee</groupId>
-    <artifactId>guiced-swagger-ui</artifactId>
+    <artifactId>swagger-ui</artifactId>
 
     <packaging>jar</packaging>
     <version>2.0.3-SNAPSHOT</version>
