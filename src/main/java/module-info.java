@@ -4,6 +4,7 @@ import com.guicedee.servlets.swaggerui.SwaggerUIRegistration;
 
 open module com.guicedee.swaggerui {
     requires com.guicedee.vertx.web;
+    requires static lombok;
 
     provides com.guicedee.vertx.web.spi.VertxRouterConfigurator with SwaggerUIRegistration;
     provides IGuiceScanModuleInclusions with SwaggerUIInclusion;

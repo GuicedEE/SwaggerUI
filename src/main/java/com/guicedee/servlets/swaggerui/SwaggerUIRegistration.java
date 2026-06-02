@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.guicedee.vertx.web.spi.VertxRouterConfigurator;
 import io.vertx.core.http.MimeMapping;
 import io.vertx.ext.web.Router;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Registers the Swagger UI static content with a Vert.x {@link Router}.
@@ -27,6 +28,7 @@ import io.vertx.ext.web.Router;
  *     <li>{@value #PROPERTY_INDEX_PAGE} (default {@value #DEFAULT_INDEX_PAGE})</li>
  * </ul>
  */
+@Log4j2
 public class SwaggerUIRegistration implements VertxRouterConfigurator<SwaggerUIRegistration> {
     @Override
     public Integer sortOrder()
@@ -90,20 +92,20 @@ public class SwaggerUIRegistration implements VertxRouterConfigurator<SwaggerUIR
         // resolves resources within the module's own namespace.
         Module swaggerModule = SwaggerUIRegistration.class.getModule();
 
-        System.out.println("[SwaggerUI] Registering route: " + route + " with prefix: " + pathPrefix + " resourceRoot: " + resourceRoot);
-        System.out.println("[SwaggerUI] Module: " + swaggerModule.getName() + ", isNamed: " + swaggerModule.isNamed());
+        log.info("📋 Registering Swagger UI route: {} with prefix: {} resourceRoot: {}", route, pathPrefix, resourceRoot);
+        log.debug("📦 Module: {}, isNamed: {}", swaggerModule.getName(), swaggerModule.isNamed());
         // Quick probe of the resource
         try {
             var probe = swaggerModule.getResourceAsStream(resourceRoot + "/" + indexPage);
-            System.out.println("[SwaggerUI] Probe " + resourceRoot + "/" + indexPage + " => " + probe);
+            log.debug("🔍 Probe {}/{} => {}", resourceRoot, indexPage, probe);
             if (probe != null) probe.close();
         } catch (Exception e) {
-            System.out.println("[SwaggerUI] Probe failed: " + e);
+            log.warn("⚠️ Probe failed: {}", e.getMessage());
         }
 
         final String prefix = pathPrefix;
         router.get(route).handler(ctx -> {
-            System.out.println("[SwaggerUI] Handler invoked for: " + ctx.normalizedPath());
+            log.trace("🌐 Handler invoked for: {}", ctx.normalizedPath());
             String normalisedPath = ctx.normalizedPath();
             String path = normalisedPath.length() > prefix.length()
                     ? normalisedPath.substring(prefix.length())
