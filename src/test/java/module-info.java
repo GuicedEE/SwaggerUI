@@ -5,5 +5,5 @@ module guiced.swagger.ui.tests {
     requires org.junit.jupiter.api;
     requires java.net.http;
 
-    opens com.guicedee.servlets.swaggerui.tests to com.google.guice,com.fasterxml.jackson.databind,org.junit.platform.commons;
+    opens com.guicedee.servlets.swaggerui.tests to com.google.guice,tools.jackson.databind,org.junit.platform.commons;
 }
